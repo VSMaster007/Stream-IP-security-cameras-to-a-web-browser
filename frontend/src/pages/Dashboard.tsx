@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useState } from "react";
 import { CameraCard } from "../components/CameraCard.js";
 import { ErrorMessage } from "../components/ErrorMessage.js";
-import { fetchCameraStatus, fetchCameras } from "../services/cameraApi.js";
-import type { Camera, CameraStatus } from "../types/camera.js";
+import { useStreamStatus } from "../hooks/useStreamStatus.js";
+import { fetchCameras } from "../services/cameraApi.js";
+import type { Camera } from "../types/camera.js";
 import type { PlaybackState } from "../types/playback.js";
 
 export function Dashboard() {
@@ -10,12 +11,12 @@ export function Dashboard() {
   const [refreshing, setRefreshing] = useState(false);
   const [cameras, setCameras] = useState<Camera[]>([]);
   const [loadError, setLoadError] = useState<string | null>(null);
-  const [status, setStatus] = useState<CameraStatus | null>(null);
-  const [statusError, setStatusError] = useState<string | null>(null);
   const [playbackState, setPlaybackState] = useState<PlaybackState>("idle");
   const [playbackDetail, setPlaybackDetail] = useState<string | null>(null);
   const [sessionId, setSessionId] = useState(1);
   const [requestId, setRequestId] = useState(0);
+  const camera = cameras[0];
+  const monitored = useStreamStatus(camera?.id ?? null);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -33,26 +34,6 @@ export function Dashboard() {
         setCameras(nextCameras);
         setLoadError(null);
         setPhase("ready");
-        const camera = nextCameras[0];
-        if (!camera) {
-          setStatus(null);
-          setStatusError(null);
-          return;
-        }
-        try {
-          const nextStatus = await fetchCameraStatus(camera.id, controller.signal);
-          if (controller.signal.aborted) {
-            return;
-          }
-          setStatus(nextStatus);
-          setStatusError(null);
-        } catch (error) {
-          if (controller.signal.aborted || isAbort(error)) {
-            return;
-          }
-          setStatus(null);
-          setStatusError(error instanceof Error ? error.message : "Status check failed");
-        }
       } catch (error) {
         if (controller.signal.aborted || isAbort(error)) {
           return;
@@ -69,9 +50,11 @@ export function Dashboard() {
     return () => controller.abort();
   }, [requestId]);
 
+  const refreshStatus = monitored.refresh;
   const refresh = useCallback(() => {
     setRequestId((current) => current + 1);
-  }, []);
+    refreshStatus();
+  }, [refreshStatus]);
 
   const retryPlayback = useCallback(() => {
     setPlaybackState("idle");
@@ -83,8 +66,6 @@ export function Dashboard() {
     setPlaybackState(state);
     setPlaybackDetail(detail ?? null);
   }, []);
-
-  const camera = cameras[0];
 
   return (
     <div className="dashboard">
@@ -109,8 +90,8 @@ export function Dashboard() {
         {phase === "ready" && camera ? (
           <CameraCard
             camera={camera}
-            status={status}
-            statusError={statusError}
+            status={monitored.status}
+            statusError={monitored.error}
             playbackState={playbackState}
             playbackDetail={playbackDetail}
             sessionId={sessionId}
