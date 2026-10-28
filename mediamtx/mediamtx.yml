@@ -1,0 +1,76 @@
+# MediaMTX v1.21.3
+# Field names match https://mediamtx.org/docs/references/configuration-file
+# for release v1.21.3. Do not add keys that are absent from that reference.
+
+logLevel: info
+logDestinations: [stdout]
+
+# Control API stays on the container network. Compose must not publish :9997.
+api: true
+apiAddress: :9997
+
+# Playback, metrics, and pprof are unused by this dashboard.
+playback: false
+metrics: false
+pprof: false
+
+# RTSP ingest only. TCP avoids Docker UDP source-address problems.
+rtsp: true
+rtspTransports: [tcp]
+rtspAddress: :8554
+rtspEncryption: "no"
+
+# Unused listeners stay off so the container does not open extra ports.
+rtmp: false
+hls: false
+srt: false
+moq: false
+
+webrtc: true
+webrtcAddress: :8889
+webrtcEncryption: false
+# v1.21.1 and later reject browser WHEP POST requests from origins that are
+# not listed here. Add a remote dashboard origin before using one.
+webrtcAllowOrigins:
+  - http://127.0.0.1:5173
+  - http://localhost:5173
+# Advertise only the host the browser can reach. Docker bridge addresses are
+# not useful to a browser on the host. Override with MTX_WEBRTCADDITIONALHOSTS
+# when a LAN or public address is required.
+webrtcIPsFromInterfaces: false
+webrtcAdditionalHosts:
+  - 127.0.0.1
+webrtcLocalUDPAddress: :8189
+webrtcLocalTCPAddress: ""
+
+authMethod: internal
+authInternalUsers:
+  # Browsers read cam1. The demo publisher is the only intended publisher.
+  - user: any
+    pass:
+    ips: []
+    permissions:
+      - action: publish
+        path: cam1
+      - action: read
+        path: cam1
+  # API calls are limited to loopback and private networks. The port is not
+  # mapped to the host, so this is the backend container and local checks.
+  - user: any
+    pass:
+    ips:
+      - 127.0.0.1
+      - "::1"
+      - 10.0.0.0/8
+      - 172.16.0.0/12
+      - 192.168.0.0/16
+    permissions:
+      - action: api
+
+paths:
+  # Demo mode keeps source as publisher and FFmpeg pushes RTSP to this path.
+  # Real-camera mode overrides source with MTX_PATHS_CAM1_SOURCE.
+  # There is no all_others entry, so unknown paths are rejected.
+  cam1:
+    source: publisher
+    rtspTransport: tcp
