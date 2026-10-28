@@ -1,22 +1,20 @@
 import { useCallback, useEffect, useState } from "react";
 import { CameraCard } from "../components/CameraCard.js";
 import { ErrorMessage } from "../components/ErrorMessage.js";
+import { usePlaybackRecovery } from "../hooks/usePlaybackRecovery.js";
 import { useStreamStatus } from "../hooks/useStreamStatus.js";
 import { fetchCameras } from "../services/cameraApi.js";
 import type { Camera } from "../types/camera.js";
-import type { PlaybackState } from "../types/playback.js";
 
 export function Dashboard() {
   const [phase, setPhase] = useState<"loading" | "ready" | "error">("loading");
   const [refreshing, setRefreshing] = useState(false);
   const [cameras, setCameras] = useState<Camera[]>([]);
   const [loadError, setLoadError] = useState<string | null>(null);
-  const [playbackState, setPlaybackState] = useState<PlaybackState>("idle");
-  const [playbackDetail, setPlaybackDetail] = useState<string | null>(null);
-  const [sessionId, setSessionId] = useState(1);
   const [requestId, setRequestId] = useState(0);
   const camera = cameras[0];
   const monitored = useStreamStatus(camera?.id ?? null);
+  const playback = usePlaybackRecovery();
 
   useEffect(() => {
     const controller = new AbortController();
@@ -56,17 +54,6 @@ export function Dashboard() {
     refreshStatus();
   }, [refreshStatus]);
 
-  const retryPlayback = useCallback(() => {
-    setPlaybackState("idle");
-    setPlaybackDetail(null);
-    setSessionId((current) => current + 1);
-  }, []);
-
-  const onPlaybackState = useCallback((state: PlaybackState, detail?: string) => {
-    setPlaybackState(state);
-    setPlaybackDetail(detail ?? null);
-  }, []);
-
   return (
     <div className="dashboard">
       <header className="topbar">
@@ -92,13 +79,13 @@ export function Dashboard() {
             camera={camera}
             status={monitored.status}
             statusError={monitored.error}
-            playbackState={playbackState}
-            playbackDetail={playbackDetail}
-            sessionId={sessionId}
+            playbackState={playback.playbackState}
+            playbackDetail={playback.playbackDetail}
+            sessionId={playback.sessionId}
             refreshing={refreshing}
-            onPlaybackState={onPlaybackState}
+            onPlaybackState={playback.onPlaybackState}
             onRefresh={refresh}
-            onRetryPlayback={retryPlayback}
+            onRetryPlayback={playback.retryNow}
           />
         ) : null}
       </main>
