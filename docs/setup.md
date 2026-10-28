@@ -22,4 +22,4 @@ cp .env.example .env
 
 Leave `STREAM_SOURCE_MODE=demo` until a camera URL is available. Real camera values stay in `.env` and are never returned by the API.
 
-MediaMTX configuration is described in [mediamtx.md](mediamtx.md).
+MediaMTX configuration is described in [mediamtx.md](mediamtx.md). The generated test stream is described in [../demo/README.md](../demo/README.md).
