@@ -6,7 +6,7 @@ https://github.com/bluenviron/mediamtx/blob/v1.21.3/internal/servers/webrtc/read
 
 The file is vendored at `frontend/src/lib/mediamtx/reader.js` and talks to the WHEP endpoint directly, for example `http://127.0.0.1:8889/cam1/whep`. Video packets do not pass through the Node.js API.
 
-The upstream class retries forever after two seconds. This copy adds `automaticRetry`. The player sets it to `false`, closes the peer connection, and sends the WHEP `DELETE` that the reader already performs on failure. A later dashboard layer decides when to construct a new reader.
+The upstream class retries forever after two seconds. This copy adds `automaticRetry`. The player sets it to `false`, closes the peer connection, and sends the WHEP `DELETE` that the reader already performs on failure. `usePlaybackRecovery` then owns retries: delays of 1, 2, 4, 8, 16, and 30 seconds plus up to 20 percent jitter, capped at 10 attempts. A live `playing` event resets the counter. Retry playback starts a new session immediately and cancels a pending timer. Unmount clears that timer so a closed component cannot open another reader.
 
 Playback state comes from the reader and the video element:
 
