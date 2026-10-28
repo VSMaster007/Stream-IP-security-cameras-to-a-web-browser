@@ -12,7 +12,7 @@ npm run build
 npm run dev
 ```
 
-The dashboard listens on `http://127.0.0.1:5173`.
+The dashboard listens on `http://127.0.0.1:5173`. The API listens on `http://127.0.0.1:3001` when `npm run dev` is started from the repository root. Copy `.env.example` to `.env` before starting the backend if you need values other than the defaults. The API contract is in [api.md](api.md).
 
 ## Environment
 
