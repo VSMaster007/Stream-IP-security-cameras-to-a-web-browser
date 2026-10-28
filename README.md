@@ -166,6 +166,10 @@ These checks were actually run on this repository:
 
 The screenshot above is from that override: the dashboard is on `http://127.0.0.1:5173`, and playback uses `http://127.0.0.1:18889/cam1/whep` with ICE UDP `18189`. The committed Compose file still publishes `8889` and `8189`. A remote LAN client and a physical camera were not part of the run.
 
+`docs/evidence/product-live.png` is a separate visual mock and is not output from this application.
+
+![Separate visual mock, not a screenshot of this application](docs/evidence/product-live.png)
+
 ## Security
 
 Read [docs/security.md](docs/security.md) before exposing any port beyond loopback. There is no authentication. `npm audit` reported one high-severity Zod advisory in the API and three Vitest advisories in the dev tree. `npm audit fix --force` was not applied.
