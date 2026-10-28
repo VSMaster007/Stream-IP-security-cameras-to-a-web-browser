@@ -1,0 +1,27 @@
+:root {
+  color-scheme: dark;
+  font-family: "Segoe UI", system-ui, sans-serif;
+  background: #0f1419;
+  color: #e7ecf1;
+}
+
+body {
+  margin: 0;
+}
+
+.shell {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 48px 20px;
+}
+
+.eyebrow {
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #8ea0b5;
+  font-size: 0.75rem;
+}
+
+code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
