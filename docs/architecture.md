@@ -31,4 +31,4 @@ Three states stay separate:
 
 The data model uses one camera, `cam1`. Additional cameras can be added later as more path records. This repository does not claim multi-camera operation.
 
-MediaMTX is pinned to v1.21.3. Configuration field names are taken from the [v1.21.3 configuration reference](https://mediamtx.org/docs/references/configuration-file). The browser uses the official `MediaMTXWebRTCReader` against the WHEP endpoint `http://<host>:8889/cam1/whep`.
+MediaMTX is pinned to v1.21.3. Configuration field names are taken from the [v1.21.3 configuration reference](https://mediamtx.org/docs/references/configuration-file). The browser uses the official `MediaMTXWebRTCReader` against the WHEP endpoint `http://<host>:8889/cam1/whep`. The hop-by-hop explanation is in [streaming-workflow.md](streaming-workflow.md).
