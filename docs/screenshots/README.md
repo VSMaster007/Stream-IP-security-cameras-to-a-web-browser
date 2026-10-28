@@ -1,6 +1,6 @@
 # Screenshots
 
-No screenshot files are stored in this directory. The images captured during local verification were browser-tool output, not files committed as product evidence.
+Image files in this directory are ignored by Git. The captured demo screenshot is [../evidence/demo-live.png](../evidence/demo-live.png), and the README embeds it.
 
 A useful set, when you take them yourself, is:
 

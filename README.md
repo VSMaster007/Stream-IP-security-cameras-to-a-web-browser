@@ -145,14 +145,26 @@ Supporting docs: [API](docs/api.md), [MediaMTX](docs/mediamtx.md), [player](docs
 
 ## Verification and limits
 
+This is the local demo dashboard on 28 October 2026. The picture is the FFmpeg test pattern. Source health is Ready and browser playback is Live at the same time. The video element was 1280 by 720. No physical camera was connected.
+
+![Demo Camera live, with source health Ready and browser playback Live](docs/evidence/demo-live.png)
+
+At the same time, `GET http://127.0.0.1:3001/api/cameras/cam1/status` returned:
+
+```json
+{"id":"cam1","sourceState":"ready","reachability":"skipped","tracks":["H264","Opus"],"detail":"Source is online"}
+```
+
+`reachability` is `skipped` because demo mode has no camera host to probe.
+
 These checks were actually run on this repository:
 
-- `npm run lint`, `npm run typecheck`, `npm test`, and `npm run build` passed.
+- `npm run lint`, `npm run typecheck`, `npm test`, and `npm run build` passed. The unit run was 38 backend tests and 20 frontend tests.
 - `npm run test:integration` passed. Default ports `8889` and `8189` were busy, so the script used `18889` and `18189`. Headless Chrome reached Live at 1280 pixels wide. Stopping the publisher produced `offline`. Starting it again produced `ready`.
 - `docker compose --env-file .env.example --profile demo up --build -d` built `bluenviron/mediamtx:1.21.3`, the backend, the frontend, and the demo image, then failed to bind UDP `8189` because another process already had it.
-- The same images, with a temporary port override, served the dashboard. Source health was Ready, playback was Live, Refresh updated the last-checked time, and Retry playback returned to Live. `docker compose --profile demo down` removed that project.
+- The same images, with a temporary port override, served the dashboard. Source health was Ready, playback was Live, Refresh updated the last-checked time, and Retry playback returned to Live.
 
-Not verified as the unmodified default command: a demo stack whose host ports are `8889` and `8189`, because those ports were already taken. A remote LAN client and a physical camera were not part of the run.
+The screenshot above is from that override: the dashboard is on `http://127.0.0.1:5173`, and playback uses `http://127.0.0.1:18889/cam1/whep` with ICE UDP `18189`. The committed Compose file still publishes `8889` and `8189`. A remote LAN client and a physical camera were not part of the run.
 
 ## Security
 
