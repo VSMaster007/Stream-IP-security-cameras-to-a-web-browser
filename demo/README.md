@@ -31,6 +31,6 @@ The path is ready when the Control API reports `"online": true` for `cam1`. `rea
 
 ## Container
 
-`demo/Dockerfile` is based on `alpine:3.22.2` and runs the same script. Docker Compose profile `demo` wires this publisher to the MediaMTX service. See the Docker section of the setup guide after that profile is added.
+`demo/Dockerfile` is based on `alpine:3.22.2` and runs the same script. Docker Compose profile `demo` wires this publisher to `rtsp://mediamtx:8554/cam1`. See the Docker section of [../docs/setup.md](../docs/setup.md).
 
 The publisher has no camera credentials. Do not put an RTSP URL with a password in the shell history if you reuse this script for a real camera. Real cameras are pulled by MediaMTX, not published by this script.

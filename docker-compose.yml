@@ -1,0 +1,85 @@
+# Local development stack. Host ports are bound to loopback.
+# RTSP :8554 and the Control API :9997 stay on the Compose network.
+
+name: ip-camera-dashboard
+
+services:
+  mediamtx:
+    image: bluenviron/mediamtx:1.21.3
+    restart: unless-stopped
+    volumes:
+      - ./mediamtx/mediamtx.yml:/mediamtx.yml:ro
+    environment:
+      # Empty RTSP_URL selects the demo publisher. A non-empty value makes
+      # MediaMTX pull that camera. Do not start the demo profile in that case.
+      MTX_PATHS_CAM1_SOURCE: ${RTSP_URL:-publisher}
+      MTX_WEBRTCADDITIONALHOSTS: ${WEBRTC_ADDITIONAL_HOSTS:-127.0.0.1}
+    ports:
+      - "127.0.0.1:8889:8889"
+      - "127.0.0.1:8189:8189/udp"
+
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      STREAM_SOURCE_MODE: ${STREAM_SOURCE_MODE:-demo}
+      CAMERA_ID: ${CAMERA_ID:-cam1}
+      CAMERA_NAME: ${CAMERA_NAME:-Demo Camera}
+      RTSP_URL: ${RTSP_URL:-}
+      # Listen on every container interface. The published port stays on loopback.
+      BACKEND_HOST: 0.0.0.0
+      BACKEND_PORT: "3001"
+      CORS_ORIGIN: ${CORS_ORIGIN:-http://127.0.0.1:5173}
+      MEDIAMTX_API_URL: http://mediamtx:9997
+      MEDIAMTX_API_TIMEOUT_MS: ${MEDIAMTX_API_TIMEOUT_MS:-2000}
+      WHEP_URL: ${WHEP_URL:-http://127.0.0.1:8889/cam1/whep}
+    ports:
+      - "127.0.0.1:3001:3001"
+    depends_on:
+      mediamtx:
+        condition: service_started
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "fetch('http://127.0.0.1:3001/api/health').then((response)=>process.exit(response.ok?0:1)).catch(()=>process.exit(1))",
+        ]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+      start_period: 5s
+
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+      args:
+        VITE_API_BASE_URL: ${VITE_API_BASE_URL:-http://127.0.0.1:3001}
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:5173:5173"
+    depends_on:
+      backend:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:5173/"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+      start_period: 3s
+
+  demo:
+    profiles: ["demo"]
+    build:
+      context: ./demo
+    restart: unless-stopped
+    environment:
+      RTSP_PUBLISH_URL: rtsp://mediamtx:8554/cam1
+    depends_on:
+      mediamtx:
+        condition: service_started
