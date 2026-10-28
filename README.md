@@ -34,7 +34,7 @@ npm run typecheck
 npm test
 ```
 
-`npm run dev` starts the Vite dashboard on `http://127.0.0.1:5173`. Backend, MediaMTX, and demo-stream commands are added with their features and documented in `docs/setup.md`.
+`npm run dev` starts the backend on `http://127.0.0.1:3001` and the Vite dashboard on `http://127.0.0.1:5173`. MediaMTX and the demo publisher are started separately. See [docs/setup.md](docs/setup.md) and [docs/api.md](docs/api.md).
 
 ## Configuration
 
