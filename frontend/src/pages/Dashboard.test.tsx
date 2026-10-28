@@ -59,7 +59,7 @@ describe("Dashboard", () => {
     expect(screen.getByRole("heading", { name: "IP Camera RTSP-to-WebRTC Dashboard" })).toBeInTheDocument();
     expect(screen.getByText("Loading camera")).toBeInTheDocument();
     expect(await screen.findByRole("heading", { name: "Office Camera" })).toBeInTheDocument();
-    expect(screen.getByText("Ready")).toBeInTheDocument();
+    expect(await screen.findByText("Ready")).toBeInTheDocument();
     expect(await screen.findByText("Connecting")).toBeInTheDocument();
     expect(screen.getByLabelText("Camera video")).toBeInTheDocument();
     expect(created[0]?.url).toBe(camera.whepUrl);
