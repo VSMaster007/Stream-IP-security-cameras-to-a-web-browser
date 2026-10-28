@@ -10,6 +10,7 @@ export default tseslint.config(
       "**/node_modules/**",
       "playwright-report/**",
       "test-results/**",
+      "frontend/src/lib/mediamtx/reader.js",
     ],
   },
   eslint.configs.recommended,
