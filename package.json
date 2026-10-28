@@ -17,11 +17,13 @@
     "build": "npm run build --workspaces --if-present",
     "lint": "eslint .",
     "typecheck": "npm run typecheck --workspaces --if-present",
-    "test": "npm run test --workspaces --if-present"
+    "test": "npm run test --workspaces --if-present",
+    "test:integration": "node tests/integration/demo-stack.mjs"
   },
   "devDependencies": {
-    "concurrently": "^9.2.1",
     "@eslint/js": "^9.39.2",
+    "@playwright/test": "^1.64.1",
+    "concurrently": "^9.2.1",
     "eslint": "^9.39.2",
     "globals": "^16.4.0",
     "typescript": "^5.9.3",
