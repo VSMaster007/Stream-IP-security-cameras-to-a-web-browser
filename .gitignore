@@ -12,6 +12,7 @@ test-results/
 blob-report/
 playwright/.cache/
 *.tsbuildinfo
+package-lock.json
 frontend/dist/
 backend/dist/
 mediamtx/mediamtx
